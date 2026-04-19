@@ -1,0 +1,452 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  open_id           String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  isActive      Boolean   @default(true)
+  role          Role      @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  privileges    String[]  @default([])
+  accounts      Account[]
+  sessions      Session[]
+  addresses     Address[]
+  orders        Order[]
+  templateId    String?
+  template      PermissionTemplate? @relation(fields: [templateId], references: [id])
+  customPermissions Json? // Stores individual permission overrides
+
+  // Personal & Contact Info
+  phoneNumber   String?
+  comments      String? // General notes about employee
+
+  // Primary Address Details
+  addressLine1  String?
+  addressLine2  String?
+  city          String?
+  state         String?
+  zipCode       String?
+  country       String?
+
+  // Professional & Login Controls
+  loginStartTime String? // e.g., "08:00"
+  loginEndTime   String?   // e.g., "17:00"
+  hireDate       DateTime?
+  birthday       DateTime?
+  employeeNumber String?   @unique
+  language       String    @default("en")
+
+  // Financials
+  canOverridePrices Boolean @default(false)
+  maxDiscount       Float   @default(0)
+  commissionRate    Float   @default(0)
+  commissionMethod  String? // e.g., "PERCENT_OF_PROFIT", "PERCENT_OF_SALE"
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model PasswordResetToken {
+  id      String   @id @default(cuid())
+  token   String   @unique
+  email   String
+  expires DateTime
+
+  @@index([email])
+  @@index([expires])
+}
+
+model Category {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  slug        String     @unique
+  description String?
+  image       String?
+  parentId    String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  isActive    Boolean    @default(true)
+  isPopular   Boolean    @default(false)
+  parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryHierarchy")
+  products    Product[]
+}
+
+model Occasion {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  image       String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  isPopular   Boolean   @default(false)
+  products    Product[] @relation("OccasionToProduct")
+}
+
+model Recipient {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  products    Product[] @relation("RecipientToProduct")
+}
+
+model Mood {
+  id          String        @id @default(cuid())
+  name        String        @unique
+  slug        String        @unique
+  description String?
+  icon        String?
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  products    ProductMood[]
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
+}
+
+model Discount {
+  id          String       @id @default(cuid())
+  name        String
+  description String?
+  value       Float
+  type        DiscountType @default(PERCENTAGE)
+  isActive    Boolean      @default(true)
+  startsAt    DateTime?
+  endsAt      DateTime?
+  products    Product[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Product {
+  id          String     @id @default(cuid())
+  name        String
+  description String?
+  price       Float
+  salePrice   Float?
+  stock       Int        @default(0)
+  sizes       String[]   @default([])
+  colors      String[]   @default([])
+  isActive    Boolean    @default(true)
+  isNewArrival Boolean   @default(false)
+  isTrending  Boolean    @default(false)
+  isTopRated  Boolean    @default(false)
+  isBestSeller Boolean   @default(false)
+  showInDiscountSection Boolean @default(false)
+  isPremiumGiftBox Boolean @default(false)
+  isSpecialTouch Boolean   @default(false)
+  specialTouchOrder Int     @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  categoryId  String?
+  discountId  String?
+  productImages   Json
+  productVariants Json
+  category    Category?  @relation(fields: [categoryId], references: [id])
+  discount    Discount?  @relation(fields: [discountId], references: [id], onDelete: Restrict)
+  occasions   Occasion[] @relation("OccasionToProduct")
+  recipients  Recipient[] @relation("RecipientToProduct")
+  moods       ProductMood[]
+  boxItems    GiftBoxItem[] @relation("BoxToItems")
+  appearsInBoxes GiftBoxItem[] @relation("ItemToBoxes")
+}
+
+model GiftBoxItem {
+  id        String  @id @default(cuid())
+  boxId     String
+  itemId    String
+  quantity  Int     @default(1)
+  sortOrder Int     @default(0)
+  box       Product @relation("BoxToItems", fields: [boxId], references: [id], onDelete: Cascade)
+  item      Product @relation("ItemToBoxes", fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([boxId, itemId])
+  @@index([boxId])
+  @@index([itemId])
+}
+
+model ProductMood {
+  productId String
+  moodId    String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  mood      Mood    @relation(fields: [moodId], references: [id], onDelete: Cascade)
+
+  @@id([productId, moodId])
+  @@index([moodId])
+}
+
+enum Role {
+  USER
+  ADMIN
+  SUPER_ADMIN
+  POS_ADMIN
+  STOREFRONT_ADMIN
+  CUSTOM_ROLE
+}
+
+model GiftCard {
+  id           String    @id @default(cuid())
+  code         String    @unique
+  initialValue Float
+  balance      Float
+  currency     String    @default("LKR")
+  image        String?
+  isActive     Boolean   @default(true)
+  expiresAt    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+enum AddressType {
+  BILLING
+  DELIVERY
+  STAFF_PERMANENT
+}
+
+model PermissionTemplate {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  permissions Json     // Stores structured boolean flags { section: { perm: boolean } }
+  users       User[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Address {
+  id           String      @id @default(uuid())
+  userId       String
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type         AddressType
+  contactName  String
+  phoneNumber  String
+  addressLine1 String
+  addressLine2 String?
+  city         String
+  postalCode   String
+  isDefault    Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([userId])
+  @@index([userId, isDefault])
+}
+
+model PromoBanner {
+  id        String   @id @default(cuid())
+  key       String   @unique // e.g., "promo_1", "promo_2"
+  imageUrl  String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  PACKED
+  READY_TO_SHIP
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  COD
+  DIRECTPAY
+  MINTPAY
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+model ShippingConfig {
+  id                    String   @id @default("default")
+  deliveryFee           Float    @default(350)
+  freeDeliveryThreshold Float    @default(5000)
+  expressDeliveryFee    Float    @default(650)
+  isDeliveryEnabled     Boolean  @default(true)
+  deliveryNote          String?
+  updatedAt             DateTime @updatedAt
+
+  @@unique([id])
+}
+
+model GiftWrap {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  price       Float
+  imageUrl    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Order {
+  id                    String           @id @default(cuid())
+  orderNumber           String           @unique
+  userId                String
+  user                  User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Customer Info (denormalized for snapshotting)
+  customerName          String
+  customerEmail         String
+  customerPhone         String
+  
+  // Shipping Address (JSON snapshot)
+  billingAddress        Json?
+  shippingAddress       Json
+  recipientName         String?
+  recipientPhone        String?
+  senderName            String?
+  senderPhone           String?
+  
+  // Financials (with snapshots of config at time of order)
+  subtotal              Float
+  deliveryFee           Float
+  freeDeliveryThreshold Float
+  total                 Float
+  
+  // Status & Payment
+  orderStatus           OrderStatus      @default(PENDING)
+  paymentMethod         PaymentMethod    @default(COD)
+  paymentStatus         PaymentStatus    @default(PENDING)
+  
+  // Payment Gateway Fields
+  paymentReference      String?
+  paymentAttemptedAt    DateTime?
+  paymentConfirmedAt    DateTime?
+  gatewayResponse       Json?
+  webhookVerified       Boolean          @default(false)
+  
+  // Gift Specific
+  isGift                Boolean          @default(false)
+  giftMessage           String?
+  giftWrapping          Boolean          @default(false)
+  noteStyle             String?
+  revealSender          Boolean          @default(true)
+  suppressInvoice       Boolean          @default(false)
+  internalNotes         String?
+
+  // Gift Wrapping snapshots
+  giftWrapId            String?
+  giftWrapName          String?
+  giftWrapPrice         Float?           @default(0)
+  
+  // Relations
+  items                 OrderItem[]
+  statusHistory         OrderStatusHistory[]
+  
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+  
+  @@index([userId])
+  @@index([orderStatus])
+  @@index([paymentStatus])
+  @@index([createdAt])
+}
+
+model OrderStatusHistory {
+  id              String      @id @default(cuid())
+  orderId         String
+  order           Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  status          OrderStatus
+  note            String?
+  changedByUserId String?
+  changedByName   String?
+  createdAt       DateTime    @default(now())
+
+  @@index([orderId, createdAt])
+}
+
+model OrderItem {
+  id                String   @id @default(cuid())
+  orderId           String
+  order             Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  productId         String
+  
+  // Denormalized product info (snapshot at time of order)
+  productName       String
+  productImage      String?
+  
+  quantity          Int
+  unitPrice         Float
+  salePrice         Float?
+  subtotal          Float
+  
+  // Discount snapshots
+  discountId        String?
+  discountName      String?
+  discountValue     Float?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([orderId])
+  @@index([productId])
+}

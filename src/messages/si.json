@@ -1,0 +1,84 @@
+{
+  "HomePage": {
+    "shopByCategory": "කාණ්ඩය අනුව",
+    "browseAllCategories": "සියලුම තෑගි කාණ්ඩ පිරික්සන්න",
+    "shopByOccasion": "අවස්ථාව අනුව",
+    "findPerfectGift": "ඕනෑම අවස්ථාවක් සඳහා කදිම තෑග්ග සොයා ගන්න",
+    "buildYourOwnBox": "ඔබේම පෙට්ටියක් සාදන්න",
+    "createPersonalizedGift": "පුද්ගලීකරණය කළ තෑග්ගක් සාදන්න",
+    "curatedCollectionsSubtitle": "අපගේ එකතුවෙන් කදිම තෑග්ග සොයා ගන්න"
+  },
+  "Navigation": {
+    "home": "මුල් පිටුව",
+    "categories": "කාණ්ඩ",
+    "occasions": "අවස්ථා",
+    "about": "අප ගැන",
+    "contact": "සම්බන්ධ වන්න",
+    "giftBoxes": "තෑගි පෙට්ටි",
+    "boxBuilder": "පෙට්ටි සාදන්නා"
+  },
+  "Common": {
+    "viewAll": "සියල්ල බලන්න",
+    "addToCart": "කරත්තයට එක් කරන්න",
+    "language": "භාෂාව"
+  },
+  "Profile": {
+    "dashboard": "පුවරුව",
+    "orders": "ඇණවුම්",
+    "addresses": "ලිපින",
+    "billing": "බිල්පත්",
+    "settings": "සැකසුම්",
+    "logout": "පිටවෙන්න",
+    "welcome": "නැවත සාදරයෙන් පිළිගනිමු,",
+    "overview": "ගිණුම් දළ විශ්ලේෂණය",
+    "recentOrders": "මෑත ඇණවුම්",
+    "noOrders": "ඔබ තවමත් කිසිදු ඇණවුමක් කර නැත.",
+    "accountStatus": "ගිණුම් තත්ත්වය",
+    "active": "සක්‍රීය",
+    "memberSince": "සාමාජිකත්වය ලැබුවේ",
+    "viewOrders": "සියලුම ඇණවුම් බලන්න",
+    "manageAddresses": "ලිපින කළමනාකරණය",
+    "updateBilling": "බිල්පත් තොරතුරු යාවත්කාලීන කරන්න"
+  },
+  "Addresses": {
+    "title": "මගේ ලිපින",
+    "description": "ඔබගේ බිල්පත් සහ නැව්ගත කිරීමේ ලිපින මෙහි කළමනාකරණය කරන්න.",
+    "addAddress": "අලුත් ලිපිනයක් එක් කරන්න",
+    "editAddress": "ලිපිනය සංස්කරණය කරන්න",
+    "deleteAddress": "ලිපිනය මකන්න",
+    "setDefault": "පෙරනිමිය ලෙස සකසන්න",
+    "billing": "බිල්පත්",
+    "shipping": "නැව්ගත කිරීමේ",
+    "isDefault": "පෙරනිමි",
+    "contactName": "සම්බන්ධක නම",
+    "phoneNumber": "දුරකථන අංකය",
+    "addressLine1": "ලිපිනය 1",
+    "addressLine2": "ලිපිනය 2 (විකල්ප)",
+    "city": "නගරය",
+    "postalCode": "තැපැල් කේතය",
+    "save": "ලිපිනය සුරකින්න",
+    "cancel": "අවලංගු කරන්න",
+    "confirmDelete": "ඔබට විශ්වාසද මෙම ලිපිනය මැකීමට අවශ්‍ය බව?",
+    "noAddresses": "ඔබ තවමත් කිසිදු ලිපිනයක් එක් කර නැත.",
+    "validation": {
+      "contactNameMin": "නම අවම වශයෙන් අක්ෂර 2ක් විය යුතුය.",
+      "phoneNumberInvalid": "කරුණාකර වලංගු ශ්‍රී ලංකා දුරකථන අංකයක් ඇතුළත් කරන්න.",
+      "addressLine1Min": "ලිපිනය අවම වශයෙන් අක්ෂර 5ක් විය යුතුය.",
+      "cityRequired": "නගරය අවශ්‍ය වේ.",
+      "postalCodeInvalid": "කරුණාකර වලංගු තැපැල් කේතයක් ඇතුළත් කරන්න.",
+      "typeRequired": "කරුණාකර ලිපින වර්ගය තෝරන්න."
+    }
+  },
+  "Auth": {
+    "error": "සත්‍යාපන දෝෂයකි",
+    "suspended": "ගිණුම සීමා කර ඇත",
+    "suspendedDescription": "ඔබගේ ගිණුම පරිපාලනය විසින් තාවකාලිකව අත්හිටුවා හෝ සීමා කර ඇත. මෙය අපගේ නීතී රීතී උල්ලංඝනය කිරීමක් හෝ ප්‍රමාද වූ සත්‍යාපනයක් නිසා විය හැකිය.",
+    "genericError": "පුරනය වීමේ ක්‍රියාවලියේදී යම් දෝෂයක් සිදු විය. කරුණාකර නැවත උත්සාහ කරන්න හෝ ගැටලුව පවතී නම් අපව අමතන්න.",
+    "contactSupport": "සහාය අමතන්න",
+    "backHome": "මුල් පිටුවට",
+    "errorCode": "දෝෂ කේතය",
+    "status": "තත්ත්වය",
+    "suspendedStatus": "අත්හිටුවා ඇත",
+    "appealSupport": "කරුණාකර කරුණු පැහැදිලි කිරීමට හෝ අභියාචනයක් ඉදිරිපත් කිරීමට Skyish & Earthly සහාය අමතන්න."
+  }
+}

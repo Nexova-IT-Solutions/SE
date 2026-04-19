@@ -1,0 +1,220 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-plus-jakarta);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+}
+
+:root {
+  --radius: 0.75rem;
+  
+  /* Brand Colors - Skyish & Earthly */
+  --brand-primary: #315243;
+  --brand-dark: #1A3026;
+  --brand-bg: #FFFFFF;
+  --brand-surface: #F4FAF8;
+  --brand-text: #1F2925;
+  --brand-muted: #5F7A6F;
+  --brand-border: #D1E2DB;
+  
+  /* Shadcn/ui compatible values */
+  --background: #FFFFFF;
+  --foreground: #1F2925;
+  --card: #FFFFFF;
+  --card-foreground: #1F2925;
+  --popover: #FFFFFF;
+  --popover-foreground: #1F2925;
+  --primary: #315243;
+  --primary-foreground: #FFFFFF;
+  --secondary: #9B854A;
+  --secondary-foreground: #FFFFFF;
+  --muted: #F4FAF8;
+  --muted-foreground: #5F7A6F;
+  --accent: #9B854A;
+  --accent-foreground: #FFFFFF;
+  --destructive: #DC2626;
+  --border: #D1E2DB;
+  --input: #D1E2DB;
+  --ring: #315243;
+  
+  /* Chart colors */
+  --chart-1: #315243;
+  --chart-2: #9B854A;
+  --chart-3: #1A3026;
+  --chart-4: #2D3D37;
+  --chart-5: #FFEB3B;
+  
+  /* Sidebar */
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #1F2925;
+  --sidebar-primary: #315243;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #F4FAF8;
+  --sidebar-accent-foreground: #315243;
+  --sidebar-border: #D1E2DB;
+  --sidebar-ring: #315243;
+}
+
+.dark {
+  --background: #111A16;
+  --foreground: #F4FAF8;
+  --card: #1A2621;
+  --card-foreground: #F4FAF8;
+  --popover: #1A2621;
+  --popover-foreground: #F4FAF8;
+  --primary: #49A389;
+  --primary-foreground: #FFFFFF;
+  --secondary: #CFB53B;
+  --secondary-foreground: #111A16;
+  --muted: #1A2621;
+  --muted-foreground: #8DA89D;
+  --accent: #CFB53B;
+  --accent-foreground: #111A16;
+  --destructive: #EF4444;
+  --border: #2D3D37;
+  --input: #2D3D37;
+  --ring: #49A389;
+  --chart-1: #49A389;
+  --chart-2: #CFB53B;
+  --chart-3: #8BC34A;
+  --chart-4: #1A3026;
+  --chart-5: #FFEB3B;
+  --sidebar: #1A2621;
+  --sidebar-foreground: #F4FAF8;
+  --sidebar-primary: #49A389;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #111A16;
+  --sidebar-accent-foreground: #49A389;
+  --sidebar-border: #2D3D37;
+  --sidebar-ring: #49A389;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Custom scrollbar styling */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--brand-border);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--brand-muted);
+}
+
+/* Hide scrollbar but allow scrolling */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Smooth page transitions */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s ease-out;
+}
+
+/* Capacity indicator animation */
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 37%, #f1f5f9 63%);
+  background-size: 400% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}

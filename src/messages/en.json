@@ -1,0 +1,84 @@
+{
+  "HomePage": {
+    "shopByCategory": "Shop by Category",
+    "browseAllCategories": "Browse all fashion categories",
+    "shopByOccasion": "Shop by Occasion",
+    "findPerfectGift": "Find the perfect outfit for any event",
+    "buildYourOwnBox": "Style Bundles",
+    "createPersonalizedGift": "Create a personalized look",
+    "curatedCollectionsSubtitle": "Find the perfect match from our curated collections"
+  },
+  "Navigation": {
+    "home": "Home",
+    "categories": "Categories",
+    "occasions": "Occasions",
+    "about": "About Us",
+    "contact": "Contact",
+    "giftBoxes": "Collections",
+    "boxBuilder": "Style Bundles"
+  },
+  "Common": {
+    "viewAll": "View All",
+    "addToCart": "Add to Cart",
+    "language": "Language"
+  },
+  "Profile": {
+    "dashboard": "Dashboard",
+    "orders": "Orders",
+    "addresses": "Addresses",
+    "billing": "Billing",
+    "settings": "Settings",
+    "logout": "Sign Out",
+    "welcome": "Welcome back,",
+    "overview": "Account Overview",
+    "recentOrders": "Recent Orders",
+    "noOrders": "You haven't placed any orders yet.",
+    "accountStatus": "Account Status",
+    "active": "Active",
+    "memberSince": "Member Since",
+    "viewOrders": "View all orders",
+    "manageAddresses": "Manage addresses",
+    "updateBilling": "Update billing details"
+  },
+  "Addresses": {
+    "title": "My Addresses",
+    "description": "Manage your billing and shipping addresses for a faster checkout experience.",
+    "addAddress": "Add New Address",
+    "editAddress": "Edit Address",
+    "deleteAddress": "Delete Address",
+    "setDefault": "Set as Default",
+    "billing": "Billing",
+    "shipping": "Shipping",
+    "isDefault": "Default",
+    "contactName": "Contact Name",
+    "phoneNumber": "Phone Number",
+    "addressLine1": "Address Line 1",
+    "addressLine2": "Address Line 2 (Optional)",
+    "city": "City",
+    "postalCode": "Postal Code",
+    "save": "Save Address",
+    "cancel": "Cancel",
+    "confirmDelete": "Are you sure you want to delete this address?",
+    "noAddresses": "You haven't added any addresses yet.",
+    "validation": {
+      "contactNameMin": "Contact name must be at least 2 characters.",
+      "phoneNumberInvalid": "Please enter a valid Sri Lankan phone number.",
+      "addressLine1Min": "Address line 1 must be at least 5 characters.",
+      "cityRequired": "City is required.",
+      "postalCodeInvalid": "Please enter a valid 5-digit Sri Lankan postal code.",
+      "typeRequired": "Please select an address type."
+    }
+  },
+  "Auth": {
+    "error": "Authentication Error",
+    "suspended": "Account Restricted",
+    "suspendedDescription": "Your account has been temporarily suspended or restricted by the administration. This may be due to a violation of our terms or pending verification.",
+    "genericError": "Something went wrong during the sign-in process. Please try again or contact support if the issue persists.",
+    "contactSupport": "Contact Support",
+    "backHome": "Back to Home",
+    "errorCode": "Error Code",
+    "status": "Status",
+    "suspendedStatus": "SUSPENDED",
+    "appealSupport": "Please contact Skyish & Earthly support for appeal or clarification."
+  }
+}

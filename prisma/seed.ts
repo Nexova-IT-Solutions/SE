@@ -153,11 +153,11 @@ async function main() {
 
   // 4. Create Moods
   const moods = [
-    { id: 'mood-minimalist', name: 'Minimalist', icon: '✨', isActive: true },
-    { id: 'mood-elegant', name: 'Elegant', icon: '💎', isActive: true },
-    { id: 'mood-romantic', name: 'Romantic', icon: '🌹', isActive: true },
-    { id: 'mood-joyful', name: 'Joyful', icon: '🎈', isActive: true },
-    { id: 'mood-sophisticated', name: 'Sophisticated', icon: '👗', isActive: true },
+    { id: 'mood-minimalist', name: 'Minimalist', slug: 'minimalist', icon: '✨', isActive: true },
+    { id: 'mood-elegant', name: 'Elegant', slug: 'elegant', icon: '💎', isActive: true },
+    { id: 'mood-romantic', name: 'Romantic', slug: 'romantic', icon: '🌹', isActive: true },
+    { id: 'mood-joyful', name: 'Joyful', slug: 'joyful', icon: '🎈', isActive: true },
+    { id: 'mood-sophisticated', name: 'Sophisticated', slug: 'sophisticated', icon: '👗', isActive: true },
   ]
 
   for (const m of moods) {

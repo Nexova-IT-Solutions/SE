@@ -5,7 +5,7 @@ import createNextIntlPlugin from 'next-intl/plugin';
 const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
-  output: "standalone",
+  // output: "standalone", // Disabled for Netlify compatibility
   /* config options here */
   typescript: {
     ignoreBuildErrors: true,

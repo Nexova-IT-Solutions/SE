@@ -70,10 +70,10 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
         sizes: true,
         colors: true,
         productImages: true,
-        productVariants: true,
         isActive: true,
         createdAt: true,
       },
+
       orderBy: { createdAt: "desc" },
       skip,
       take: pageSize,

@@ -39,8 +39,8 @@ type ProductData = {
   sizes: string[];
   colors: string[];
   productImages: any;
-  productVariants: any;
   isActive: boolean;
+
   createdAt: Date;
 };
 

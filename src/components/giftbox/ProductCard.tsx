@@ -85,8 +85,10 @@ function ProductCardComponent({
             src={displayImage}
             alt={product.name}
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
+
           {hasDiscount && (
             <Badge className="absolute top-1 left-1 bg-[#FF4757] text-white border-0 text-[10px] px-1.5 py-0.5">-{discount}%</Badge>
           )}
@@ -118,8 +120,10 @@ function ProductCardComponent({
             src={displayImage}
             alt={product.name}
             fill
+            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
             className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
+
             <Badge className="absolute top-2 left-2 bg-[#CFB53B] text-white border-0">
               <Star className="w-3 h-3 mr-1" /> Best Seller
             </Badge>
@@ -147,8 +151,10 @@ function ProductCardComponent({
             src={displayImage}
             alt={product.name}
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
             className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
+
           
           {/* Badges */}
           {badge ? (

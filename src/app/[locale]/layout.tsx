@@ -43,22 +43,8 @@ import { CartStoreHydrator } from "@/components/cart/cart-store-hydrator";
 import WhatsAppFloating from "@/components/WhatsAppFloating";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
-export default async function RootLayout({
-  children,
-  params
-}: {
-  children: React.ReactNode;
-  params: { locale: string };
-}) {
-  const { locale } = await params;
-  
-  if (!locales.includes(locale as any)) {
-    notFound();
-  }
-
-  const messages = await getMessages();
+async function SpecialTouchHydrator() {
   let specialTouchProducts = [];
-
   try {
     const rows = await db.product.findMany({
       where: {
@@ -85,10 +71,28 @@ export default async function RootLayout({
 
     specialTouchProducts = normalizeSpecialTouchProducts(rows);
   } catch (error) {
-    // Temporary fallback until the Product schema change is applied in all environments.
     console.warn("Failed to load special touch products:", error);
     specialTouchProducts = [];
   }
+
+  return <CartStoreHydrator specialTouchProducts={specialTouchProducts} />;
+}
+
+export default async function RootLayout({
+  children,
+  params
+}: {
+  children: React.ReactNode;
+  params: { locale: string };
+}) {
+  const { locale } = await params;
+  
+  if (!locales.includes(locale as any)) {
+    notFound();
+  }
+
+  const messages = await getMessages();
+
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
@@ -97,7 +101,9 @@ export default async function RootLayout({
         <NextIntlClientProvider messages={messages}>
           <NuqsAdapter>
             <Providers>
-              <CartStoreHydrator specialTouchProducts={specialTouchProducts} />
+              <Suspense fallback={null}>
+                <SpecialTouchHydrator />
+              </Suspense>
               {children}
               <WhatsAppFloating />
               <Toaster />
@@ -108,3 +114,4 @@ export default async function RootLayout({
     </html>
   );
 }
+

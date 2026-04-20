@@ -1,4 +1,7 @@
 import { Suspense } from "react";
+
+export const revalidate = 3600;
+
 import { Footer, Header, CartDrawer, SectionHeading } from "@/components/giftbox";
 import { CategoriesFilters } from "./_components/categories-filters";
 import { ProductsGrid } from "./_components/ProductsGrid";

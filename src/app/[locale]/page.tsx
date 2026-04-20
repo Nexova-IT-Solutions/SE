@@ -10,6 +10,9 @@ import { authOptions } from "@/lib/auth";
 import { Suspense } from "react";
 import { Prisma } from "@prisma/client";
 
+export const revalidate = 3600;
+
+
 const storefrontHasImageWhere: Prisma.ProductWhereInput = {
   NOT: {
     productImages: {

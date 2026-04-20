@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+export const revalidate = 3600;
+
 import { Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
 import "../globals.css";
 import { Toaster } from "@/components/ui/toaster";

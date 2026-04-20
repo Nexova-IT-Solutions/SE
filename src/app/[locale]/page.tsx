@@ -125,9 +125,210 @@ function mapDbProductToCardProduct(product: HomeProductRecord) {
   };
 }
 
+// ========== Data Fetching Functions for Parallelization ==========
+
+async function getSuggestedProducts(userId: string) {
+  return await (db.product as any).findMany({
+    where: { isActive: true, ...activeOrNoDiscountWhere, ...storefrontHasImageWhere },
+    orderBy: { updatedAt: "desc" },
+    take: 5,
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      price: true,
+      salePrice: true,
+      showInDiscountSection: true,
+      stock: true,
+      categoryId: true,
+      productImages: true,
+      colors: true,
+      discount: true,
+    },
+  });
+}
+
+async function getTrendingProducts() {
+  return await (db.product as any).findMany({
+    where: { isActive: true, isTrending: true, ...activeOrNoDiscountWhere, ...storefrontHasImageWhere },
+    orderBy: { updatedAt: "desc" },
+    take: 5,
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      price: true,
+      salePrice: true,
+      showInDiscountSection: true,
+      stock: true,
+      categoryId: true,
+      productImages: true,
+      colors: true,
+      discount: true,
+    },
+  });
+}
+
+async function getTrendingCategories() {
+  return await db.category.findMany({
+    where: { parentId: null, isActive: true, isPopular: true },
+    orderBy: { name: "asc" },
+    take: 5,
+  });
+}
+
+async function getTrendingOccasions() {
+  return await db.occasion.findMany({
+    where: { isActive: true, isPopular: true },
+    orderBy: { name: "asc" },
+    take: 5,
+  });
+}
+
+async function getPremiumBoxes() {
+  const giftBoxCategory = await db.category.findFirst({
+    where: {
+      isActive: true,
+      slug: {
+        contains: "gift-box",
+        mode: "insensitive",
+      },
+    },
+    select: { id: true },
+  });
+
+  if (!giftBoxCategory) return [];
+
+  return (await (db.product as any).findMany({
+    where: {
+      isActive: true,
+      categoryId: giftBoxCategory.id,
+      ...activeOrNoDiscountWhere,
+      ...storefrontHasImageWhere,
+    },
+    orderBy: { updatedAt: "desc" },
+    take: 5,
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      price: true,
+      salePrice: true,
+      stock: true,
+      showInDiscountSection: true,
+      productImages: true,
+      colors: true,
+      discount: true,
+    },
+  })) as Array<Omit<PremiumBoxRecord, "boxItems">>;
+}
+
+async function getAccessories() {
+  return await (db.product as any).findMany({
+    where: { 
+      isActive: true, 
+      category: {
+        slug: {
+          contains: "accessories",
+          mode: "insensitive",
+        },
+      },
+      ...activeOrNoDiscountWhere, 
+      ...storefrontHasImageWhere 
+    },
+    orderBy: { createdAt: "desc" },
+    take: 5,
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      price: true,
+      salePrice: true,
+      stock: true,
+      showInDiscountSection: true,
+      categoryId: true,
+      productImages: true,
+      colors: true,
+      discount: true,
+    }
+  });
+}
+
+async function getDiscountedProducts() {
+  return await (db.product as any).findMany({
+    where: { isActive: true, showInDiscountSection: true, discount: { is: activeDiscountWhere }, ...storefrontHasImageWhere },
+    orderBy: { updatedAt: "desc" },
+    take: 5,
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      price: true,
+      salePrice: true,
+      showInDiscountSection: true,
+      stock: true,
+      categoryId: true,
+      productImages: true,
+      colors: true,
+      discount: true,
+    },
+  });
+}
+
+async function getFootwear() {
+  return await (db.product as any).findMany({
+    where: { 
+      isActive: true,
+      category: {
+        slug: {
+          contains: "shoes",
+          mode: "insensitive",
+        },
+      },
+      ...activeOrNoDiscountWhere, 
+      ...storefrontHasImageWhere 
+    },
+    orderBy: { createdAt: "desc" },
+    take: 5,
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      price: true,
+      salePrice: true,
+      stock: true,
+      showInDiscountSection: true,
+      categoryId: true,
+      productImages: true,
+      colors: true,
+      discount: true,
+    }
+  });
+}
+
 export default async function HomePage() {
-  const t = await getTranslations("HomePage");
   const session = await getServerSession(authOptions);
+
+  // Fetch all data in parallel
+  const [
+    suggestedProducts,
+    trendingProducts,
+    trendingCategories,
+    trendingOccasions,
+    premiumBoxesData,
+    accessories,
+    discountedProducts,
+    footwear
+  ] = await Promise.all([
+    session?.user?.id ? getSuggestedProducts(session.user.id) : Promise.resolve([]),
+    getTrendingProducts(),
+    getTrendingCategories(),
+    getTrendingOccasions(),
+    getPremiumBoxes(),
+    getAccessories(),
+    getDiscountedProducts(),
+    getFootwear(),
+  ]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -140,16 +341,11 @@ export default async function HomePage() {
 
         {/* 2. Suggested For You - Only if authenticated */}
         {session && (
-          <Suspense fallback={<div className="py-12 px-4 md:px-8 lg:px-10 max-w-[1600px] mx-auto"><SectionSkeleton /></div>}>
-            <SuggestedForYouSection userId={session.user?.id} />
-          </Suspense>
+          <SuggestedForYouSection products={suggestedProducts} />
         )}
 
-
         {/* 4. Trending Now */}
-        <Suspense fallback={<div className="py-12 px-4 md:px-8 lg:px-10 max-w-[1600px] mx-auto"><SectionSkeleton /></div>}>
-          <TrendingNowSection />
-        </Suspense>
+        <TrendingNowSection products={trendingProducts} />
 
         {/* 5. Promotional Banner 1 */}
         <Suspense fallback={null}>
@@ -157,25 +353,16 @@ export default async function HomePage() {
         </Suspense>
 
         {/* 6. Trending Categories */}
-        <Suspense fallback={<div className="py-12 px-4 md:px-8 lg:px-10 max-w-[1600px] mx-auto"><CategoryGridSkeleton /></div>}>
-          <TrendingCategoriesSection />
-        </Suspense>
+        <TrendingCategoriesSection categories={trendingCategories} />
 
         {/* 7. Trending Occasions */}
-        <Suspense fallback={<div className="py-12 px-4 md:px-8 lg:px-10 max-w-[1600px] mx-auto"><OccasionGridSkeleton /></div>}>
-          <TrendingOccasionsSection />
-        </Suspense>
-
+        <TrendingOccasionsSection occasions={trendingOccasions} />
 
         {/* 9. Premium Gift Boxes */}
-        <Suspense fallback={<div className="py-12 px-4 md:px-8 lg:px-10 max-w-[1600px] mx-auto"><SectionSkeleton /></div>}>
-          <PremiumGiftBoxesSection />
-        </Suspense>
+        <PremiumGiftBoxesSection products={premiumBoxesData} />
 
         {/* 10. Accessories */}
-        <Suspense fallback={<div className="py-12 px-4 md:px-8 lg:px-10 max-w-[1600px] mx-auto"><SectionSkeleton /></div>}>
-          <AccessoriesSection />
-        </Suspense>
+        <AccessoriesSection products={accessories} />
 
         {/* 11. Promotional Banner 2 */}
         <Suspense fallback={null}>
@@ -183,14 +370,11 @@ export default async function HomePage() {
         </Suspense>
 
         {/* 12. Discounted Items */}
-        <Suspense fallback={<div className="py-12 px-4 md:px-8 lg:px-10 max-w-[1600px] mx-auto"><SectionSkeleton /></div>}>
-          <DiscountedItemsSection />
-        </Suspense>
+        <DiscountedItemsSection products={discountedProducts} />
 
         {/* 13. Footwear */}
-        <Suspense fallback={<div className="py-12 px-4 md:px-8 lg:px-10 max-w-[1600px] mx-auto"><SectionSkeleton /></div>}>
-          <FootwearSection />
-        </Suspense>
+        <FootwearSection products={footwear} />
+
 
         {/* Trust Badges */}
         <section className="py-12 px-4 md:px-8 lg:px-10 max-w-[1600px] mx-auto">
@@ -234,31 +418,8 @@ export default async function HomePage() {
 
 // ========== Async Components for Data-Heavy Sections ==========
 
-async function SuggestedForYouSection({ userId }: { userId?: string }) {
-  const t = await getTranslations("HomePage");
-  if (!userId) return null;
-
-  // Fetch actual products from the database for recommendations
-  const suggestedProducts = await (db.product as any).findMany({
-    where: { isActive: true, ...activeOrNoDiscountWhere, ...storefrontHasImageWhere },
-    orderBy: { updatedAt: "desc" },
-    take: 5,
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      price: true,
-      salePrice: true,
-      showInDiscountSection: true,
-      stock: true,
-      categoryId: true,
-      productImages: true,
-      colors: true,
-      discount: true,
-    },
-  });
-
-  if (suggestedProducts.length === 0) return null;
+async function SuggestedForYouSection({ products }: { products: HomeProductRecord[] }) {
+  if (products.length === 0) return null;
 
   return (
     <section className="py-12 px-4 md:px-8 lg:px-10 max-w-[1600px] mx-auto">
@@ -269,7 +430,7 @@ async function SuggestedForYouSection({ userId }: { userId?: string }) {
         viewAllLink="/categories"
       />
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6">
-        {suggestedProducts.map((product: HomeProductRecord) => (
+        {products.map((product: HomeProductRecord) => (
           <ProductCard key={product.id} product={mapDbProductToCardProduct(product)} />
         ))}
       </div>
@@ -278,28 +439,9 @@ async function SuggestedForYouSection({ userId }: { userId?: string }) {
 }
 
 
-async function TrendingNowSection() {
-  const t = await getTranslations("HomePage");
-  const trendingProducts = await (db.product as any).findMany({
-    where: { isActive: true, isTrending: true, ...activeOrNoDiscountWhere, ...storefrontHasImageWhere },
-    orderBy: { updatedAt: "desc" },
-    take: 5,
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      price: true,
-      salePrice: true,
-      showInDiscountSection: true,
-      stock: true,
-      categoryId: true,
-      productImages: true,
-      colors: true,
-      discount: true,
-    },
-  });
 
-  if (trendingProducts.length === 0) return null;
+async function TrendingNowSection({ products }: { products: any[] }) {
+  if (products.length === 0) return null;
 
   return (
     <section className="py-12 px-4 md:px-8 lg:px-10 max-w-[1600px] mx-auto">
@@ -310,7 +452,7 @@ async function TrendingNowSection() {
         viewAllLink="/categories"
       />
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6">
-        {trendingProducts.map((product) => (
+        {products.map((product) => (
           <ProductCard key={product.id} product={mapDbProductToCardProduct(product)} />
         ))}
       </div>
@@ -318,15 +460,9 @@ async function TrendingNowSection() {
   );
 }
 
-async function TrendingCategoriesSection() {
-  const t = await getTranslations("HomePage");
-  const trendingCategories = await db.category.findMany({
-    where: { parentId: null, isActive: true, isPopular: true },
-    orderBy: { name: "asc" },
-    take: 5,
-  });
 
-  if (trendingCategories.length === 0) return null;
+async function TrendingCategoriesSection({ categories }: { categories: any[] }) {
+  if (categories.length === 0) return null;
 
   return (
     <section className="py-12 px-4 md:px-8 lg:px-10 max-w-[1600px] mx-auto">
@@ -337,7 +473,7 @@ async function TrendingCategoriesSection() {
         viewAllLink="/categories"
       />
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-        {trendingCategories.map((category) => (
+        {categories.map((category) => (
           <CategoryCard key={category.id} category={category as any} />
         ))}
       </div>
@@ -345,15 +481,9 @@ async function TrendingCategoriesSection() {
   );
 }
 
-async function TrendingOccasionsSection() {
-  const t = await getTranslations("HomePage");
-  const trendingOccasions = await db.occasion.findMany({
-    where: { isActive: true, isPopular: true },
-    orderBy: { name: "asc" },
-    take: 5,
-  });
 
-  if (trendingOccasions.length === 0) return null;
+async function TrendingOccasionsSection({ occasions }: { occasions: any[] }) {
+  if (occasions.length === 0) return null;
 
   return (
     <section className="py-12 px-4 md:px-8 lg:px-10 max-w-[1600px] mx-auto">
@@ -362,7 +492,7 @@ async function TrendingOccasionsSection() {
         subtitle="Find the perfect look for every occasion"
       />
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-        {trendingOccasions.map((occasion) => (
+        {occasions.map((occasion) => (
           <OccasionCard key={occasion.id} occasion={occasion as any} />
         ))}
       </div>
@@ -370,47 +500,9 @@ async function TrendingOccasionsSection() {
   );
 }
 
-async function PremiumGiftBoxesSection() {
-  // Compatibility-safe path: avoids fields that may not exist on stale Prisma clients.
-  const giftBoxCategory = await db.category.findFirst({
-    where: {
-      isActive: true,
-      slug: {
-        contains: "gift-box",
-        mode: "insensitive",
-      },
-    },
-    select: { id: true },
-  });
 
-  if (!giftBoxCategory) {
-    return null;
-  }
-
-  const premiumBoxes = (await (db.product as any).findMany({
-    where: {
-      isActive: true,
-      categoryId: giftBoxCategory.id,
-      ...activeOrNoDiscountWhere,
-      ...storefrontHasImageWhere,
-    },
-    orderBy: { updatedAt: "desc" },
-    take: 5,
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      price: true,
-      salePrice: true,
-      stock: true,
-      showInDiscountSection: true,
-      productImages: true,
-      colors: true,
-      discount: true,
-    },
-  })) as Array<Omit<PremiumBoxRecord, "boxItems">>;
-
-  const normalizedBoxes: PremiumBoxRecord[] = premiumBoxes.map((box) => ({
+async function PremiumGiftBoxesSection({ products }: { products: Array<Omit<PremiumBoxRecord, "boxItems">> }) {
+  const normalizedBoxes: PremiumBoxRecord[] = products.map((box) => ({
     ...box,
     boxItems: [],
   }));
@@ -456,38 +548,8 @@ async function PremiumGiftBoxesSection() {
     </section>
   );
 }
-async function AccessoriesSection() {
-  const products = await (db.product as any).findMany({
-    where: { 
-      isActive: true, 
-      category: {
-        slug: {
-          contains: "accessories",
-          mode: "insensitive",
-        },
-      },
-      ...activeOrNoDiscountWhere, 
-      ...storefrontHasImageWhere 
-    },
-    orderBy: { createdAt: "desc" },
-    take: 8,
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      price: true,
-      salePrice: true,
-      stock: true,
-      showInDiscountSection: true,
-      categoryId: true,
-      productImages: true,
-      colors: true,
-      discount: true,
-    }
-  });
 
-  const displayProducts = products.slice(0, 5);
-
+async function AccessoriesSection({ products }: { products: any[] }) {
   return (
     <section className="py-12 px-4 md:px-8 lg:px-10 max-w-[1600px] mx-auto">
       <SectionHeading
@@ -497,8 +559,8 @@ async function AccessoriesSection() {
         viewAllLink="/categories"
       />
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6">
-        {displayProducts.length > 0 ? (
-          displayProducts.map((product) => (
+        {products.length > 0 ? (
+          products.map((product) => (
             <ProductCard 
               key={product.id} 
               product={mapDbProductToCardProduct(product as HomeProductRecord)}
@@ -514,28 +576,9 @@ async function AccessoriesSection() {
   );
 }
 
-async function DiscountedItemsSection() {
-  const t = await getTranslations("HomePage");
-  const discountedProducts = await (db.product as any).findMany({
-    where: { isActive: true, showInDiscountSection: true, discount: { is: activeDiscountWhere }, ...storefrontHasImageWhere },
-    orderBy: { updatedAt: "desc" },
-    take: 5,
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      price: true,
-      salePrice: true,
-      showInDiscountSection: true,
-      stock: true,
-      categoryId: true,
-      productImages: true,
-      colors: true,
-      discount: true,
-    },
-  });
 
-  if (discountedProducts.length === 0) return null;
+async function DiscountedItemsSection({ products }: { products: HomeProductRecord[] }) {
+  if (products.length === 0) return null;
 
   return (
     <section className="py-12 px-4 md:px-8 lg:px-10 max-w-[1600px] mx-auto bg-gradient-to-r from-green-50/30 to-transparent rounded-3xl">
@@ -546,45 +589,15 @@ async function DiscountedItemsSection() {
         viewAllLink="/categories"
       />
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6">
-        {discountedProducts.map((product) => (
+        {products.map((product) => (
           <ProductCard key={product.id} product={mapDbProductToCardProduct(product)} />
         ))}
       </div>
     </section>
   );
 }
-async function FootwearSection() {
-  const products = await (db.product as any).findMany({
-    where: { 
-      isActive: true,
-      category: {
-        slug: {
-          contains: "shoes",
-          mode: "insensitive",
-        },
-      },
-      ...activeOrNoDiscountWhere, 
-      ...storefrontHasImageWhere 
-    },
-    orderBy: { createdAt: "desc" },
-    take: 8,
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      price: true,
-      salePrice: true,
-      stock: true,
-      showInDiscountSection: true,
-      categoryId: true,
-      productImages: true,
-      colors: true,
-      discount: true,
-    }
-  });
 
-  const displayProducts = products.slice(0, 5);
-
+async function FootwearSection({ products }: { products: any[] }) {
   return (
     <section className="py-12 px-4 md:px-8 lg:px-10 max-w-[1600px] mx-auto">
       <SectionHeading
@@ -594,8 +607,8 @@ async function FootwearSection() {
         viewAllLink="/categories"
       />
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6">
-        {displayProducts.length > 0 ? (
-          displayProducts.map((product) => (
+        {products.length > 0 ? (
+          products.map((product) => (
             <ProductCard 
               key={product.id} 
               product={mapDbProductToCardProduct(product as HomeProductRecord)}
@@ -610,3 +623,4 @@ async function FootwearSection() {
     </section>
   );
 }
+
